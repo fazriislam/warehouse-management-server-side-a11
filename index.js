@@ -18,37 +18,30 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
   await client.connect();
-  const productsCollection = client.db('warehouse').collection('products');
-  const myItemsCollection = client.db('warehouse').collection('myItems');
+  const productCollection = client.db('warehouse').collection('product')
+  const myItemCollection = client.db('warehouse').collection('myItem')
 
-
-  app.get('/products', async (req, res) => {
-    const cursor = productsCollection.find({});
-    const products = await cursor.toArray();
+  // Receive all products by GET method
+  app.get('/product', async (req, res) => {
+    const cursor = productCollection.find({});
+    const products = await cursor.toArray()
     res.send(products);
-  });
+  })
 
-  // Update API
-  // app.get('/update/:id', async (req, res) => {
-  //   const id = req.params.id;
-  //   const query = { _id: ObjectId(id) };
-  //   const product = await productsCollection.findOne(query);
-  //   res.send(product);
-  //   // console.log("the id is", id);
-  // })
+
 
   // My items APT
-  app.post('/inventory/myItems', async(req,res)=>{
-    const product = req.body;
-    console.log(product);
-    const myItems = await myItemsCollection.insertOne(product);
-    res.send(myItems);
-  });
 
-  app.get('/myItems', async (req, res)=>{
-    const cursor = myItemsCollection.find({});
-    const myItems = await cursor.toArray();
-    res.send(myItems);
+  app.post('/myItem', async (req, res) => {
+    const product = req.body;
+    const myItem = await myItemCollection.insertOne(product);
+    res.send(myItem);
+  })
+
+  app.get('/myItem', async(req,res)=> {
+    const cursor = myItemCollection.find({});
+    const myItem = await cursor.toArray();
+    res.send(myItem);
   })
 
 }
