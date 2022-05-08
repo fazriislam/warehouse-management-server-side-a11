@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { query } = require('express');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -21,14 +22,14 @@ async function run() {
   const productCollection = client.db('warehouse').collection('product')
   const myItemCollection = client.db('warehouse').collection('myItem')
 
-  // Receive all products by GET method
+  // receive all products by GET method
   app.get('/product', async (req, res) => {
     const cursor = productCollection.find({});
     const products = await cursor.toArray()
     res.send(products);
   })
 
-  // Add Product
+  // add product
   app.post('/product', async(req,res)=>{
     const newProduct = req.body;
     const result = await productCollection.insertOne(newProduct);
@@ -37,7 +38,7 @@ async function run() {
 
 
 
-  // My items APT
+  // my items APT
   app.post('/myItem', async (req, res) => {
     const product = req.body;
     const myItem = await myItemCollection.insertOne(product);
@@ -50,11 +51,41 @@ async function run() {
     res.send(myItem);
   })
 
-  // Delete from my Item Route
+  // delete from my item route
   app.delete('/myItem/:id', async (req, res) => {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await myItemCollection.deleteOne(query);
+    res.send(result);
+  })
+
+  // get single product
+  app.get('/product/:id',async(req,res)=>{
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await productCollection.findOne(query);
+    res.send(result);
+  })
+
+  // update product
+  app.put('/product/:id', async(req,res)=>{
+    const id = req.params.id;
+    const UpdatedProduct = req.body;
+    const query = { _id: ObjectId(id) };
+    const options = { upsert: true };
+    const updatedDoc = {
+      $set:{
+        name: UpdatedProduct.name,
+        company: UpdatedProduct.company,
+        price: UpdatedProduct.price,
+        quantity: UpdatedProduct.quantity,
+        description: UpdatedProduct.description,
+        supplierName: UpdatedProduct.supplierName,
+        supplierEmail: UpdatedProduct.supplierEmail,
+        img: UpdatedProduct.img,
+      }
+    };
+    const result = await productCollection.updateOne(query,updatedDoc,options);
     res.send(result);
   })
 }
