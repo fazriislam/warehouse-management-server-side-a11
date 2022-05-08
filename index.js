@@ -31,19 +31,25 @@ async function run() {
 
 
   // My items APT
-
   app.post('/myItem', async (req, res) => {
     const product = req.body;
     const myItem = await myItemCollection.insertOne(product);
     res.send(myItem);
   })
 
-  app.get('/myItem', async(req,res)=> {
+  app.get('/myItem', async (req, res) => {
     const cursor = myItemCollection.find({});
     const myItem = await cursor.toArray();
     res.send(myItem);
   })
 
+  // Delete from my Item Route
+  app.delete('/myItem/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await myItemCollection.deleteOne(query);
+    res.send(result);
+  })
 }
 
 
