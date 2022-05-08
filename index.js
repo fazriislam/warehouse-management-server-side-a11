@@ -28,6 +28,13 @@ async function run() {
     res.send(products);
   })
 
+  // Add Product
+  app.post('/product', async(req,res)=>{
+    const newProduct = req.body;
+    const result = await productCollection.insertOne(newProduct);
+    res.send(result);
+  })
+
 
 
   // My items APT
