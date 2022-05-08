@@ -21,12 +21,20 @@ async function run() {
   await client.connect();
   const productCollection = client.db('warehouse').collection('product')
   const myItemCollection = client.db('warehouse').collection('myItem')
+  const ratingCollection = client.db('warehouse').collection('rating')
 
   // receive all products by GET method
   app.get('/product', async (req, res) => {
     const cursor = productCollection.find({});
     const products = await cursor.toArray()
     res.send(products);
+  })
+
+  // receive ratings
+  app.get('/rating', async (req,res)=>{
+    const cursor = ratingCollection.find({});
+    const rating = await cursor.toArray()
+    res.send(rating);
   })
 
   // add product
@@ -36,7 +44,12 @@ async function run() {
     res.send(result);
   })
 
-
+  // add review
+  app.post('/rating', async (req,res)=>{
+    const newReview = req.body;
+    const result = await ratingCollection.insertOne(newReview);
+    res.send(result)
+  })
 
   // my items APT
   app.post('/myItem', async (req, res) => {
